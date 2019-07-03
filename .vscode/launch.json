@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - hello",
+            "request": "launch",
+            "mainClass": "java.hello",
+            "projectName": "gitlearning_6fe61a23"
+        },
+        {
+            "type": "java",
             "name": "Debug (Launch) - External Terminal",
             "request": "launch",
             "console": "externalTerminal",
