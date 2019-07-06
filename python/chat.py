@@ -42,7 +42,7 @@ class ChatServer:
             for s in self.clients.values():
                 s.send(msg)
 
-    def stop(self):
+    def stop(self)：
         for s in self.clients.values():
             s.close()
         self.sock.close()
