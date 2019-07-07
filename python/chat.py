@@ -45,7 +45,6 @@ class ChatServer:
         for s in self.clients.values():
             s.close()
         self.sock.close()
-        self.event.set()
 if __name__=="__main__":
     cs=ChatServer()
     cs.start()
