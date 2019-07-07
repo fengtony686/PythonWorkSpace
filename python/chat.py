@@ -19,7 +19,6 @@ class ChatServer:
 
         threading.Thread(target=self.accept,name='accept').start()
     def accept(self):
-        while not self.event.is_set:#one thread
             s,raddr=self.sock.accept()#blocked
             logging.info(raddr)
             logging.info(s)
@@ -47,9 +46,10 @@ class ChatServer:
             s.close()
         self.sock.close()
         self.event.set()
-
-cs=ChatServer()
-cs.start()
+if __name__=="__main__":
+    cs=ChatServer()
+    cs.start()
+    print('local tests')
 
 while True:
     cmd=input(">>>")
