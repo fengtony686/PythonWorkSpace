@@ -54,7 +54,7 @@ class loginPage(object):
     def connect(self):
         HOST='smtp.'+self.smtp+'.com'
         try:
-            self.mySMTP=SMTP(HOST,25)
+            self.mySMTP=SMTP(HOST)
             self.mySMTP.login(self.username,self.passwd)
         except Exception as e:
             tkinter.messagebox.showerror('Connection Error','%s'%e)
@@ -144,7 +144,5 @@ if __name__=='__main__':
     myLogin=loginPage(root)
 
     mainloop()
-
-
 
 
