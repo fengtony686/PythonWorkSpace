@@ -38,7 +38,7 @@ enum GameNum
 void Print()
 {
 	system("cls");
-	cout << "*****************  2048小游戏   ******************" << endl;
+	cout << "*****************  2048 By Tony Feng   ******************" << endl;
 	for (int i = 0; i < ROW; ++i)
 	{
 		cout << "---------------------------------" << endl;
