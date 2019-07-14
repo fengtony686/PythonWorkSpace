@@ -54,7 +54,7 @@ class loginPage(object):
     def connect(self):
         HOST='smtp.'+self.smtp+'.com'
         try:
-            self.mySMTP=SMTP(HOST)
+            self.mySMTP=SMTP_SSL(HOST)
             self.mySMTP.login(self.username,self.passwd)
         except Exception as e:
             tkinter.messagebox.showerror('Connection Error','%s'%e)
@@ -112,18 +112,21 @@ class sendMail(object):
 
 
     def getMailInfo(self):
-        self.sendToAdd=self.sendToEntry.get.strip()
-        self.subjectInfo=self.subjectEntry.get().strip()
-        self.sendTextInfo=self.sendText.get(1.0,END)
+        try:
+            self.sendToAdd=self.sendToEntry.get().strip()
+            self.subjectInfo=self.subjectEntry.get().strip()
+            self.sendTextInfo=self.sendText.get(1.0,END)
+        except Exception as e:
+            tkinter.messagebox.showerror('Error', "%s" % e)
 
 
     def sendMail(self):
         self.getMailInfo()
-        body=string.join(("From: %s"%self.sender,"To: %s"%self.sendToAdd,"Subject: %s"%self.subjectInfo, "", self.sendTextInfo), "\r\n")
+        body="From: %s"%self.sender+"To: %s"%self.sendToAdd+"Subject: %s"%self.subjectInfo+" "+self.sendTextInfo+"\r\n"
         try:
             self.smtp.sendmail(self.sender, [self.sendToAdd], body)
         except Exception as e:
-            tkinter.messagebox.showerr('Sending Failed', "%s" % e)
+            tkinter.messagebox.showerror('Sending Failed', "%s" % e)
             return
         tkinter.messagebox.showinfo('Congratulations,Sending Successfully.')
 
