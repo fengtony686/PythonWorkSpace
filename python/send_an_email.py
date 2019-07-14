@@ -2,6 +2,15 @@ from smtplib import *
 from tkinter import *
 import tkinter.messagebox
 import string
+from email.mime.text import MIMEText
+from email.utils import parseaddr, formataddr
+from email import encoders
+from email.header import Header
+
+
+def _format_addr(s):
+    name, addr = parseaddr(s)
+    return formataddr((Header(name, 'utf-8').encode(), addr))
 
 class loginPage(object):
     def __init__(self, master,info='Mail Send System By Tony'):
@@ -122,13 +131,18 @@ class sendMail(object):
 
     def sendMail(self):
         self.getMailInfo()
-        body="From: %s"%self.sender+"To: %s"%self.sendToAdd+"Subject: %s"%self.subjectInfo+" "+self.sendTextInfo+"\r\n"
+        body="From: %s "%self.sender+"To: %s "%self.sendToAdd+"Subject: %s"%self.subjectInfo+" "+self.sendTextInfo+"\r\n"
+        msg=MIMEText(body,'plain','utf-8')
+        msg['From'] = _format_addr('from python client <%s>' % self.sender)
+        msg['To'] = _format_addr('<%s>' % self.sendToAdd)
+        msg['Subject'] = Header('%s'%self.subjectInfo, 'utf-8').encode()
+        print(msg.as_string())
         try:
-            self.smtp.sendmail(self.sender, [self.sendToAdd], body)
+            self.smtp.sendmail(self.sender, [self.sendToAdd], msg.as_string())
         except Exception as e:
             tkinter.messagebox.showerror('Sending Failed', "%s" % e)
             return
-        tkinter.messagebox.showinfo('Congratulations,Sending Successfully.')
+        tkinter.messagebox.showinfo('Congratulations','Sending Successfully.')
 
 
     def newMail(self):
