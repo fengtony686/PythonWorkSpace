@@ -6,6 +6,8 @@ from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
 from email import encoders
 from email.header import Header
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
 
 
 def _format_addr(s):
@@ -13,7 +15,7 @@ def _format_addr(s):
     return formataddr((Header(name, 'utf-8').encode(), addr))
 
 class loginPage(object):
-    def __init__(self, master,info='Mail Send System By Tony'):
+    def __init__(self, master,info='Mail Sending System By Tony'):
         self.master=master
         self.mainlabel=Label(master,text=info,justify=CENTER)
         self.mainlabel.grid(row=0,columnspan=3)
@@ -63,7 +65,11 @@ class loginPage(object):
     def connect(self):
         HOST='smtp.'+self.smtp+'.com'
         try:
-            self.mySMTP=SMTP_SSL(HOST)
+            if self.smtp=='gmail':
+                self.mySMTP=SMTP(HOST,587)
+                self.mySMTP.starttls()
+            else:
+                self.mySMTP=SMTP_SSL(HOST)
             self.mySMTP.login(self.username,self.passwd)
         except Exception as e:
             tkinter.messagebox.showerror('Connection Error','%s'%e)
@@ -106,18 +112,24 @@ class sendMail(object):
         self.fromToLabel.grid(row=2, column=0)
         self.formToAdd = Label(self.sendPage, text=self.sender)
         self.formToAdd.grid(row=2, column=1)
+
+
+        self.sendFile=Label(self.sendPage,text='Your File Route:')
+        self.sendFile.grid(row=3,column=0)
+        self.sendFileEntry=Entry(self.sendPage)
+        self.sendFileEntry.grid(row=3,column=1)
  
  
         self.sendText = Text(self.sendPage)
-        self.sendText.grid(row=3, column=0, columnspan=2)
+        self.sendText.grid(row=4, column=0, columnspan=2)
  
  
         self.sendButton = Button(self.sendPage, text='Send', command=self.sendMail)
-        self.sendButton.grid(row=4, column=0)
+        self.sendButton.grid(row=5, column=0)
  
  
         self.newButton = Button(self.sendPage, text='New Mail', command=self.newMail)
-        self.newButton.grid(row=4, column=1)
+        self.newButton.grid(row=5, column=1)
 
 
     def getMailInfo(self):
@@ -125,18 +137,35 @@ class sendMail(object):
             self.sendToAdd=self.sendToEntry.get().strip()
             self.subjectInfo=self.subjectEntry.get().strip()
             self.sendTextInfo=self.sendText.get(1.0,END)
+
+
+            self.windowsfileRoute=self.sendFileEntry.get().strip()
+            self.pythonfileRoute=self.windowsfileRoute.replace('\\','/')
+            self.filename=self.pythonfileRoute.strip('/')[-1]
+            self.filetype=self.pythonfileRoute.strip('.')[-1]
         except Exception as e:
             tkinter.messagebox.showerror('Error', "%s" % e)
 
 
     def sendMail(self):
         self.getMailInfo()
-        body="From: %s "%self.sender+"To: %s "%self.sendToAdd+"Subject: %s"%self.subjectInfo+" "+self.sendTextInfo+"\r\n"
-        msg=MIMEText(body,'plain','utf-8')
+        body= self.sendTextInfo+"\r\n"+'------from python client'
+        msg=MIMEMultipart('alternative')
+        msg.attach(MIMEText(body,'plain','utf-8'))
+        msg.attach(MIMEText('<html><body><h1>'+body+'</h1></body></html>','html','utf-8'))
         msg['From'] = _format_addr('from python client <%s>' % self.sender)
         msg['To'] = _format_addr('<%s>' % self.sendToAdd)
         msg['Subject'] = Header('%s'%self.subjectInfo, 'utf-8').encode()
-        print(msg.as_string())
+
+
+        ##with open(self.pythonfileRoute,'rb') as f:
+            ##mime=MIMEBase('file',self.filetype,filename=self.filename)
+            ##mime.add_header('Content-Disposition','attachment',filename=self.filename)
+            ##mime.add_header('Content-ID','<0>')
+            ##mime.add_header('X-Attachment-Id','0')
+            ##mime.set_payload(f.read())
+            ##encoders.encode_base64(mime)
+            ##msg.attach(mime)
         try:
             self.smtp.sendmail(self.sender, [self.sendToAdd], msg.as_string())
         except Exception as e:
