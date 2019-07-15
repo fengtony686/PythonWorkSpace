@@ -94,6 +94,8 @@ class loginPage(object):
                 if self.smtp=='gmail':
                     self.mySMTP=SMTP(HOST,587)
                     self.mySMTP.starttls()
+                elif self.username.split('@')[1]=='mails.tsinghua.edu.cn':
+                    self.mySMTP=SMTP_SSL('mails.tsinghua.edu.cn',465)
                 else:
                     self.mySMTP=SMTP_SSL(HOST)
             self.mySMTP.login(self.username,self.passwd)
@@ -126,6 +128,8 @@ class loginPage(object):
                 if self.smtp=='gmail':
                     self.mySMTP=SMTP(HOST,587)
                     self.mySMTP.starttls()
+                elif self.username.split('@')[1]=='mails.tsinghua.edu.cn':
+                    self.mySMTP=SMTP_SSL('mails.tsinghua.edu.cn',993)
                 else:
                     self.mySMTP=SMTP(HOST)
             self.mySMTP.login(self.username,self.passwd)
