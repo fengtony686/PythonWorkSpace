@@ -7,7 +7,8 @@ from email.utils import parseaddr, formataddr
 from email import encoders
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
+from email.mime.application import MIMEApplication
+import re
 
 
 def _format_addr(s):
@@ -27,6 +28,14 @@ class loginPage(object):
  
         self.pwd = Label(master, text='Password：', borderwidth=2)
         self.pwd.grid(row=2, sticky=W)
+
+
+        self.server = Label(master, text='Server：', borderwidth=2)
+        self.server.grid(row=3, sticky=W)
+
+
+        self.port = Label(master, text='Port：', borderwidth=2)
+        self.port.grid(row=4, sticky=W)
  
  
         self.userEntry = Entry(master)
@@ -36,14 +45,24 @@ class loginPage(object):
  
         self.pwdEntry = Entry(master, show='*')
         self.pwdEntry.grid(row=2, column=1, columnspan=2)
+
+        self.serverEntry = Entry(master)
+        self.serverEntry.grid(row=3, column=1, columnspan=2)
+
+        self.portEntry=Entry(master)
+        self.portEntry.grid(row=4,column=1,columnspan=2)
  
  
-        self.loginButton = Button(master, text='Login', borderwidth=2, command=self.login)
-        self.loginButton.grid(row=3, column=1)
+        self.loginButton = Button(master, text='Login', borderwidth=6, command=self.login)
+        self.loginButton.grid(row=5, column=1)
  
  
-        self.clearButton = Button(master, text='Clear', borderwidth=2, command=self.clear)
-        self.clearButton.grid(row=3, column=2)
+        self.clearButton = Button(master, text='Clear', borderwidth=6, command=self.clear)
+        self.clearButton.grid(row=5, column=2)
+
+
+        self.sshloginButton=Button(master,text='Use SSH To Login',borderwidth=2,command=self.sshlogin)
+        self.sshloginButton.grid(row=5,column=0)
 
 
     def login(self):
@@ -63,13 +82,19 @@ class loginPage(object):
 
 
     def connect(self):
-        HOST='smtp.'+self.smtp+'.com'
+        if not self.serverEntry.get():
+            HOST='smtp.'+self.smtp+'.com'
+        else:
+            HOST=self.serverEntry.get().strip()
         try:
-            if self.smtp=='gmail':
-                self.mySMTP=SMTP(HOST,587)
-                self.mySMTP.starttls()
+            if self.portEntry.get():
+                self.mySMTP=SMTP_SSL(HOST,int(self.portEntry.get().strip()))
             else:
-                self.mySMTP=SMTP_SSL(HOST)
+                if self.smtp=='gmail':
+                    self.mySMTP=SMTP(HOST,587)
+                    self.mySMTP.starttls()
+                else:
+                    self.mySMTP=SMTP_SSL(HOST)
             self.mySMTP.login(self.username,self.passwd)
         except Exception as e:
             tkinter.messagebox.showerror('Connection Error','%s'%e)
@@ -85,6 +110,26 @@ class loginPage(object):
     def getSmtpHost(self):
         firstSplit=self.username.split('@')[1]
         self.smtp=firstSplit.split('.')[0]
+
+    def sshlogin(self):
+        if not self.serverEntry.get():
+            HOST='smtp.'+self.smtp+'.com'
+        else:
+            HOST=self.serverEntry.get().strip()
+        try:
+            if self.portEntry.get():
+                self.mySMTP=SMTP(HOST,int(self.portEntry.get().strip()))
+            else:
+                if self.smtp=='gmail':
+                    self.mySMTP=SMTP(HOST,587)
+                    self.mySMTP.starttls()
+                else:
+                    self.mySMTP=SMTP(HOST)
+            self.mySMTP.login(self.username,self.passwd)
+        except Exception as e:
+            tkinter.messagebox.showerror('Connection Error','%s'%e)
+            return
+        self.mySendMail=sendMail(self.master,self.mySMTP,self.username)
 
 
 class sendMail(object):
@@ -118,6 +163,8 @@ class sendMail(object):
         self.sendFile.grid(row=3,column=0)
         self.sendFileEntry=Entry(self.sendPage)
         self.sendFileEntry.grid(row=3,column=1)
+        self.filehelpbutton=Button(self.sendPage,text="?",command=self.filehelp)
+        self.filehelpbutton.grid(row=3,column=2)
  
  
         self.sendText = Text(self.sendPage)
@@ -141,8 +188,8 @@ class sendMail(object):
 
             self.windowsfileRoute=self.sendFileEntry.get().strip()
             self.pythonfileRoute=self.windowsfileRoute.replace('\\','/')
-            self.filename=self.pythonfileRoute.strip('/')[-1]
-            self.filetype=self.pythonfileRoute.strip('.')[-1]
+            match=re.split('/',self.pythonfileRoute)
+            self.filename=match[-1]
         except Exception as e:
             tkinter.messagebox.showerror('Error', "%s" % e)
 
@@ -157,15 +204,16 @@ class sendMail(object):
         msg['To'] = _format_addr('<%s>' % self.sendToAdd)
         msg['Subject'] = Header('%s'%self.subjectInfo, 'utf-8').encode()
 
+        
+        if self.sendFileEntry.get():
+            try:
+                part = MIMEApplication(open(self.pythonfileRoute,'rb').read())
+                part.add_header('Content-Disposition', 'attachment', filename=self.filename)
+                msg.attach(part)
+            except Exception as e:
+                tkinter.messagebox.showerror('File Error','%s'%e)
 
-        ##with open(self.pythonfileRoute,'rb') as f:
-            ##mime=MIMEBase('file',self.filetype,filename=self.filename)
-            ##mime.add_header('Content-Disposition','attachment',filename=self.filename)
-            ##mime.add_header('Content-ID','<0>')
-            ##mime.add_header('X-Attachment-Id','0')
-            ##mime.set_payload(f.read())
-            ##encoders.encode_base64(mime)
-            ##msg.attach(mime)
+
         try:
             self.smtp.sendmail(self.sender, [self.sendToAdd], msg.as_string())
         except Exception as e:
@@ -179,6 +227,9 @@ class sendMail(object):
         self.subjectEntry.delete(0, END)
         self.sendText.delete(1.0, END)
 
+
+    def filehelp(self):
+        tkinter.messagebox.showinfo('Help','Use shortcut key tocopy your file route from your explorer,pay attention whether the route is complete.(Actually,you need to add your filename after the route you have copied)')
 
 if __name__=='__main__':
 
