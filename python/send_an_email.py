@@ -9,6 +9,7 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 import re
+import tkinter.filedialog
 
 
 def _format_addr(s):
@@ -133,11 +134,11 @@ class loginPage(object):
 
 
 class sendMail(object):
-    def __init__(self, master, smtp='', sender=''):
+    def __init__(self, master, smtp='', sender='',path='',pythonfileRoute=''):
         self.smtp = smtp
         self.sender = sender
- 
- 
+        self.path=path
+        self.pythonfileRoute=pythonfileRoute
         self.sendPage = Toplevel(master)
  
  
@@ -163,8 +164,10 @@ class sendMail(object):
         self.sendFile.grid(row=3,column=0)
         self.sendFileEntry=Entry(self.sendPage)
         self.sendFileEntry.grid(row=3,column=1)
-        self.filehelpbutton=Button(self.sendPage,text="?",command=self.filehelp)
-        self.filehelpbutton.grid(row=3,column=2)
+
+
+        self.explorerbutton=Button(self.sendPage,text="Use Explorer",command=self.fileexplorer)
+        self.explorerbutton.grid(row=3,column=2)
  
  
         self.sendText = Text(self.sendPage)
@@ -187,7 +190,10 @@ class sendMail(object):
 
 
             self.windowsfileRoute=self.sendFileEntry.get().strip()
-            self.pythonfileRoute=self.windowsfileRoute.replace('\\','/')
+            if not self.path:
+                self.pythonfileRoute=self.windowsfileRoute.replace('\\','/')
+            else:
+                self.pythonfileRoute=self.path
             match=re.split('/',self.pythonfileRoute)
             self.filename=match[-1]
         except Exception as e:
@@ -205,7 +211,7 @@ class sendMail(object):
         msg['Subject'] = Header('%s'%self.subjectInfo, 'utf-8').encode()
 
         
-        if self.sendFileEntry.get():
+        if self.path or self.sendFileEntry.get():
             try:
                 part = MIMEApplication(open(self.pythonfileRoute,'rb').read())
                 part.add_header('Content-Disposition', 'attachment', filename=self.filename)
@@ -228,9 +234,9 @@ class sendMail(object):
         self.sendText.delete(1.0, END)
 
 
-    def filehelp(self):
-        tkinter.messagebox.showinfo('Help','Use shortcut key tocopy your file route from your explorer,pay attention whether the route is complete.(Actually,you need to add your filename after the route you have copied)')
-
+    def fileexplorer(self):
+        self.path=tkinter.filedialog.askopenfilename()
+        tkinter.messagebox.showinfo('Tips','Your path is %s,do not fill the path into the left box'%self.path)
 if __name__=='__main__':
 
 
