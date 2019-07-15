@@ -1,15 +1,15 @@
+import string
+import re
 from smtplib import *
 from tkinter import *
 import tkinter.messagebox
-import string
+import tkinter.filedialog
 from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
 from email import encoders
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
-import re
-import tkinter.filedialog
 
 
 def _format_addr(s):
@@ -47,8 +47,10 @@ class loginPage(object):
         self.pwdEntry = Entry(master, show='*')
         self.pwdEntry.grid(row=2, column=1, columnspan=2)
 
+
         self.serverEntry = Entry(master)
         self.serverEntry.grid(row=3, column=1, columnspan=2)
+
 
         self.portEntry=Entry(master)
         self.portEntry.grid(row=4,column=1,columnspan=2)
@@ -71,8 +73,6 @@ class loginPage(object):
         self.passwd=self.pwdEntry.get().strip()
         if len(self.username)==0 or len(self.passwd)==0 or '@' not in self.username:
             tkinter.messagebox.showwarning('Warning','It seems that you have not enter your username or password or the format is wrong!')
-
-
             self.clear()
             self.userEntry.focus_set()
             return
@@ -100,6 +100,8 @@ class loginPage(object):
         except Exception as e:
             tkinter.messagebox.showerror('Connection Error','%s'%e)
             return
+
+
         self.mySendMail=sendMail(self.master,self.mySMTP,self.username)
 
 
@@ -130,6 +132,8 @@ class loginPage(object):
         except Exception as e:
             tkinter.messagebox.showerror('Connection Error','%s'%e)
             return
+
+
         self.mySendMail=sendMail(self.master,self.mySMTP,self.username)
 
 
@@ -162,6 +166,8 @@ class sendMail(object):
 
         self.sendFile=Label(self.sendPage,text='Your File Path:')
         self.sendFile.grid(row=3,column=0)
+
+
         self.sendFileEntry=Entry(self.sendPage)
         self.sendFileEntry.grid(row=3,column=1)
 
@@ -196,6 +202,8 @@ class sendMail(object):
                 self.pythonfileRoute=self.path
             match=re.split('/',self.pythonfileRoute)
             self.filename=match[-1]
+
+
         except Exception as e:
             tkinter.messagebox.showerror('Error', "%s" % e)
 
@@ -237,15 +245,12 @@ class sendMail(object):
     def fileexplorer(self):
         self.path=tkinter.filedialog.askopenfilename()
         tkinter.messagebox.showinfo('Tips','Your path is %s,do not fill the path into the left box'%self.path)
+
+
 if __name__=='__main__':
-
-
     root=Tk()
     root.title('Python Email Client')
-
-
     myLogin=loginPage(root)
-
     mainloop()
 
 
