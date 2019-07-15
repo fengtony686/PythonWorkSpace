@@ -160,18 +160,18 @@ class sendMail(object):
         self.formToAdd.grid(row=2, column=1)
 
 
-        self.sendFile=Label(self.sendPage,text='Your File Route:')
+        self.sendFile=Label(self.sendPage,text='Your File Path:')
         self.sendFile.grid(row=3,column=0)
         self.sendFileEntry=Entry(self.sendPage)
         self.sendFileEntry.grid(row=3,column=1)
 
 
-        self.explorerbutton=Button(self.sendPage,text="Use Explorer",command=self.fileexplorer)
+        self.explorerbutton=Button(self.sendPage,text="Use Explorer",command=self.fileexplorer,borderwidth=6)
         self.explorerbutton.grid(row=3,column=2)
  
  
         self.sendText = Text(self.sendPage)
-        self.sendText.grid(row=4, column=0, columnspan=2)
+        self.sendText.grid(row=4, column=0, columnspan=3)
  
  
         self.sendButton = Button(self.sendPage, text='Send', command=self.sendMail)
@@ -179,7 +179,7 @@ class sendMail(object):
  
  
         self.newButton = Button(self.sendPage, text='New Mail', command=self.newMail)
-        self.newButton.grid(row=5, column=1)
+        self.newButton.grid(row=5, column=2)
 
 
     def getMailInfo(self):
