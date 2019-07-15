@@ -160,14 +160,14 @@ class sendMail(object):
  
         self.fromToLabel = Label(self.sendPage, text='From:')
         self.fromToLabel.grid(row=2, column=0)
+
+
         self.formToAdd = Label(self.sendPage, text=self.sender)
         self.formToAdd.grid(row=2, column=1)
 
 
         self.sendFile=Label(self.sendPage,text='Your File Path:')
         self.sendFile.grid(row=3,column=0)
-
-
         self.sendFileEntry=Entry(self.sendPage)
         self.sendFileEntry.grid(row=3,column=1)
 
@@ -196,10 +196,7 @@ class sendMail(object):
 
 
             self.windowsfileRoute=self.sendFileEntry.get().strip()
-            if not self.path:
-                self.pythonfileRoute=self.windowsfileRoute.replace('\\','/')
-            else:
-                self.pythonfileRoute=self.path
+            self.pythonfileRoute=self.windowsfileRoute.replace('\\','/')
             match=re.split('/',self.pythonfileRoute)
             self.filename=match[-1]
 
@@ -244,7 +241,7 @@ class sendMail(object):
 
     def fileexplorer(self):
         self.path=tkinter.filedialog.askopenfilename()
-        tkinter.messagebox.showinfo('Tips','Your path is %s,do not fill the path into the left box'%self.path)
+        self.sendFileEntry.insert(100,self.path)
 
 
 if __name__=='__main__':
