@@ -241,7 +241,7 @@ class sendMail(object):
 
     def fileexplorer(self):
         self.path=tkinter.filedialog.askopenfilename()
-        self.sendFileEntry.insert(100,self.path)
+        self.sendFileEntry.insert(200,self.path)
 
 
 if __name__=='__main__':
