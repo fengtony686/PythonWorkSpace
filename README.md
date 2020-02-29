@@ -1,2 +1,2 @@
-# workspace
-my first github repository
+# My Workspace
+This is my first github repository.
