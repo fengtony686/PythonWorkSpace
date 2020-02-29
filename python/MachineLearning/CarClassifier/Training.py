@@ -7,8 +7,8 @@ import torch
 import torch.nn.functional as F
 
 LR = 0.1
-EPOCH = 4000
-matplotlib.use(backend='TkAgg')
+EPOCH = 10
+matplotlib.use(backend='WxAgg')
 
 
 data = DataLoading.load_data(download=True)
@@ -22,6 +22,9 @@ print(train_data[1])
 X_train = train_data[:, :21]
 Y_train = train_data[:, 21:]
 X_test, Y_test = test_data[:, :21], test_data[:, 21:]
+X_train = torch.from_numpy(X_train)
+Y_train = torch.from_numpy(Y_train)
+X_test = torch.from_numpy(X_test)
 
 
 class Net(nn.Module):
@@ -46,21 +49,25 @@ loss_func = nn.CrossEntropyLoss()
 
 for epoch in range(EPOCH):
     for i in range(sep):
-        X_train = torch.from_numpy(X_train)
-        Y_train = torch.from_numpy(Y_train)
         output = net(X_train[i])
-        print(X_train[i])
-        print(Y_train[i])
-        print(output)
-        loss = loss_func(output, Y_train[i])
+        target = np.argmax(Y_train[i].numpy())
+        target = torch.from_numpy(np.array([target]))
+        output = output.view(1, 4)
+        loss = loss_func(output, target)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        if epoch % 100 == 0:
-            X_test = torch.from_numpy(X_test)
-            pred_y = net(X_test).numpy()
-            pred_y = np.argmax(pred_y, 1)
-            Y_test = np.argmax(Y_test, 1)
-            plt.scatter(sep, Y_test)
-            plt.scatter(sep, pred_y)
-            plt.show()
+        if i % 100 == 0:
+            with torch.no_grad():
+                pred_y = net(X_test).numpy()
+                print(pred_y[:10])
+                print(Y_test[:10])
+
+
+Pred_y = np.argmax(pred_y[:40], axis=1)
+Y_Test = np.argmax(Y_test[:40], axis=1)
+print(Pred_y)
+print(Y_Test)
+plt.scatter(np.arange(len(Pred_y)), Pred_y)
+plt.scatter(np.arange(len(Y_Test)), Y_Test)
+plt.show()
