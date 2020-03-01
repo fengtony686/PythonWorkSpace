@@ -36,7 +36,8 @@ class DQN(object):
         self.eval_net, self.target_net = Net(), Net()
         self.memory_counter = 0  # 记录内存存了多少了
         self.learn_step_counter = 0  # 记录学了多少步了
-        self.memory = np.zeros((MEMORY_CAPACITY, N_STATES * 2 + 2))  # 形状是MEMORY_CAPACITY行，N_STATES*2+2列，这里是因为每一步需要存两个状态和一个动作一个回馈
+        self.memory = np.zeros((MEMORY_CAPACITY, N_STATES * 2 + 2))  # 形状是MEMORY_CAPACITY行，N_STATES*2+2
+        # 列，这里是因为每一步需要存两个状态和一个动作一个回馈
         self.optimizer = torch.optim.Adam(self.eval_net.parameters(), lr=LR)
         self.loss_func = nn.MSELoss()
 
