@@ -1,4 +1,4 @@
-# MLP on MINST
+# MLP on MNIST
 import os
 import torch
 import torch.nn as nn
@@ -10,18 +10,18 @@ import torchvision
 EPOCH = 5
 BATCH_SIZE = 50
 LR = 0.001
-DOWNLOAD_MINST = False
+DOWNLOAD_MNIST = False
 
 
-if not (os.path.exists('./minst/')) or not os.listdir('./minst/'):
-    DOWNLOAD_MINST = True
+if not (os.path.exists('./mnist/')) or not os.listdir('./mnist/'):
+    DOWNLOAD_MNIST = True
 
 
 train_data = torchvision.datasets.MNIST(
-    root='./minst/',
+    root='./mnist/',
     train=True,
     transform=torchvision.transforms.ToTensor(),
-    download=DOWNLOAD_MINST,
+    download=DOWNLOAD_MNIST,
 )
 train_loader = Data.DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffle=True)
 test_data = torchvision.datasets.MNIST(root='./mnist/', train=False)
