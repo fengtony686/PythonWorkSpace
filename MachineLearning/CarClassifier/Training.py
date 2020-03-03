@@ -1,14 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import DataLoading
-import matplotlib
 import torch.nn as nn
 import torch
-import torch.nn.functional as F
 
-LR = 0.1
-EPOCH = 10
-matplotlib.use(backend='WxAgg')
+
+LR = 0.1  # learning rate
+EPOCH = 10  # training epochs
 
 
 data = DataLoading.load_data(download=True)
@@ -18,7 +16,6 @@ np.random.shuffle(new_data)
 sep = int(0.7*len(new_data))
 train_data = new_data[:sep]
 test_data = new_data[sep:]
-print(train_data[1])
 X_train = train_data[:, :21]
 Y_train = train_data[:, 21:]
 X_test, Y_test = test_data[:, :21], test_data[:, 21:]
@@ -64,10 +61,11 @@ for epoch in range(EPOCH):
                 print(Y_test[:10])
 
 
-Pred_y = np.argmax(pred_y[:40], axis=1)
-Y_Test = np.argmax(Y_test[:40], axis=1)
+Pred_y = np.argmax(pred_y[:400], axis=1)
+Y_Test = np.argmax(Y_test[:400], axis=1)
 print(Pred_y)
 print(Y_Test)
+# 纵轴0,1,2,3代表车况的三个等级，横轴表示测试集中车辆的编号，橙色表示预测正确，蓝色表示预测错误
 plt.scatter(np.arange(len(Pred_y)), Pred_y)
 plt.scatter(np.arange(len(Y_Test)), Y_Test)
 plt.show()
